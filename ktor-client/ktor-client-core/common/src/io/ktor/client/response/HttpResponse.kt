@@ -8,7 +8,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.io.*
 import kotlinx.io.charsets.*
 import kotlinx.io.core.*
-import kotlinx.io.core.Closeable
 
 /**
  * A response for [HttpClient], second part of [HttpClientCall].
@@ -56,6 +55,7 @@ interface HttpResponse : HttpMessage, CoroutineScope, Closeable {
      */
     val content: ByteReadChannel
 
+    @Suppress("KDocMissingDocumentation")
     override fun close() {
         @Suppress("UNCHECKED_CAST")
         (coroutineContext[Job] as CompletableDeferred<Unit>).complete(Unit)

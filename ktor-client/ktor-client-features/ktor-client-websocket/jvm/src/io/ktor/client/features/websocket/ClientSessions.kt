@@ -2,6 +2,7 @@ package io.ktor.client.features.websocket
 
 import io.ktor.client.call.*
 import io.ktor.http.cio.websocket.*
+import io.ktor.util.*
 
 /**
  * Client specific [WebSocketSession].
@@ -24,3 +25,7 @@ class DefaultClientWebSocketSession(
         masking = true
     }
 }
+
+internal class DelegatingClientWebSocketSession(
+    override val call: HttpClientCall, session: WebSocketSession
+) : ClientWebSocketSession, WebSocketSession by session

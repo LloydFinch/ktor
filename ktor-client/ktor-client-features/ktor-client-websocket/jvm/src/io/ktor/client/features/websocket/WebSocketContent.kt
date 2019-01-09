@@ -9,7 +9,7 @@ import java.util.*
 private const val WEBSOCKET_VERSION = "13"
 private const val NONCE_SIZE = 24
 
-class WebSocketContent: ClientUpgradeContent() {
+internal class WebSocketContent: ClientUpgradeContent() {
 
     private val nonce: String = buildString {
         val bytes = ByteArray(NONCE_SIZE)

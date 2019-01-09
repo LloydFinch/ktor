@@ -76,6 +76,7 @@ internal class ConnectionPipeline(
                     val transferEncoding = rawResponse.headers[HttpHeaders.TransferEncoding]
                     val chunked = transferEncoding == "chunked"
                     val connectionType = ConnectionOptions.parse(rawResponse.headers[HttpHeaders.Connection])
+                    val headers = CIOHeaders(rawResponse.headers)
 
                     shouldClose = (connectionType == ConnectionOptions.Close)
 
@@ -83,7 +84,7 @@ internal class ConnectionPipeline(
                     val responseChannel = if (hasBody) ByteChannel() else null
 
                     val response = CIOHttpResponse(
-                        task.request, requestTime,
+                        task.request, headers, requestTime,
                         responseChannel?.let { skipCancels(it) } ?: ByteReadChannel.Empty,
                         rawResponse,
                         coroutineContext = callContext

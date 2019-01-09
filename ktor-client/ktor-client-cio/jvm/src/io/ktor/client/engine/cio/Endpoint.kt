@@ -1,8 +1,10 @@
 package io.ktor.client.engine.cio
 
+import io.ktor.client.features.websocket.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.http.cio.*
+import io.ktor.http.cio.websocket.*
 import io.ktor.network.sockets.*
 import io.ktor.network.sockets.Socket
 import io.ktor.network.tls.*
@@ -114,17 +116,16 @@ internal class Endpoint(
             val contentLength = rawResponse.headers[HttpHeaders.ContentLength]?.toString()?.toLong() ?: -1L
             val transferEncoding = rawResponse.headers[HttpHeaders.TransferEncoding]
             val connectionType = ConnectionOptions.parse(rawResponse.headers[HttpHeaders.Connection])
+            val headers = CIOHeaders(rawResponse.headers)
 
             val body = when {
                 status == HttpStatusCode.SwitchingProtocols.value -> {
                     val content = request.content as? ClientUpgradeContent
                         ?: error("Invalid content type: UpgradeContent required")
 
-                    launch {
-                        content.pipeTo(output)
-                    }.invokeOnCompletion(::closeConnection)
-
-                    input
+                    content.verify(headers)
+                    handleWebsocketUpgrade(request, input, output, callContext)
+                    ByteReadChannel.Empty
                 }
                 request.method == HttpMethod.Head -> {
                     closeConnection()
@@ -140,15 +141,23 @@ internal class Endpoint(
                 }
             }
 
-            response.complete(
-                CIOHttpResponse(
-                    request, requestTime, body, rawResponse,
-                    coroutineContext = callContext
-                )
+            val result = CIOHttpResponse(
+                request, headers, requestTime, body, rawResponse,
+                coroutineContext = callContext
             )
+
+            response.complete(result)
         } catch (cause: Throwable) {
             response.completeExceptionally(cause)
         }
+    }
+
+    private suspend fun handleWebsocketUpgrade(
+        request: HttpRequest,
+        input: ByteReadChannel, output: ByteWriteChannel, callContext: CoroutineContext
+    ) {
+        val session = RawWebSocket(input, output, coroutineContext = callContext)
+        request.attributes.put(WebSockets.sessionKey, session)
     }
 
     private suspend fun createPipeline() {

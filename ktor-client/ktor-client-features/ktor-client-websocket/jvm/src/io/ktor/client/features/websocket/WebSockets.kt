@@ -14,20 +14,20 @@ import kotlin.reflect.full.*
 
 /**
  * Client WebSocket feature.
+ *
+ * @property maxFrameSize - max size of single websocket frame.
  */
+@KtorExperimentalAPI
+@UseExperimental(WebSocketInternalAPI::class)
 class WebSockets(
     val maxFrameSize: Long = Int.MAX_VALUE.toLong()
-) : Closeable {
-
-    @KtorExperimentalAPI
-    val context = CompletableDeferred<Unit>()
-
-    override fun close() {
-        context.complete(Unit)
-    }
+) {
 
     companion object Feature : HttpClientFeature<Unit, WebSockets> {
         override val key: AttributeKey<WebSockets> = AttributeKey("Websocket")
+
+        @InternalAPI
+        val sessionKey: AttributeKey<WebSocketSession> = AttributeKey("WebsocketSession")
 
         override fun prepare(block: Unit.() -> Unit): WebSockets = WebSockets()
 
@@ -46,19 +46,20 @@ class WebSockets(
                     || content !is WebSocketContent
                 ) return@intercept
 
-                content.verify(response.headers)
+                val session = context.attributes.getOrNull(sessionKey) ?: return@intercept
 
-                val raw = RawWebSocket(
-                    response.content, content.output,
-                    feature.maxFrameSize,
-                    coroutineContext = response.coroutineContext
-                )
+                if (info.type.isSubclassOf(DefaultWebSocketSession::class)) {
+                    val defaultSession = if (session is DefaultWebSocketSession) {
+                        session
+                    } else {
+                        DefaultWebSocketSessionImpl(session, feature.maxFrameSize)
+                    }
 
-                val session = object : ClientWebSocketSession, WebSocketSession by raw {
-                    override val call: HttpClientCall = response.call
+                    proceedWith(HttpResponseContainer(info, DefaultClientWebSocketSession(context, defaultSession)))
+                    return@intercept
                 }
 
-                proceedWith(HttpResponseContainer(info, session))
+                proceedWith(HttpResponseContainer(info, DelegatingClientWebSocketSession(context, session)))
             }
         }
     }
