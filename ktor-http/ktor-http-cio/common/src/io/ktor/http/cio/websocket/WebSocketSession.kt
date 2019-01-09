@@ -3,7 +3,6 @@ package io.ktor.http.cio.websocket
 import io.ktor.util.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.*
-import java.nio.*
 import kotlin.coroutines.*
 
 /**
@@ -40,7 +39,8 @@ interface WebSocketSession : CoroutineScope {
         "Use coroutineContext instead", ReplaceWith("coroutineContext"),
         level = DeprecationLevel.ERROR
     )
-    val dispatcher: CoroutineContext get() = coroutineContext
+    val dispatcher: CoroutineContext
+        get() = coroutineContext
 
     /**
      * Flush all outstanding messages and suspend until all earlier sent messages will be written. Could be called
@@ -97,4 +97,4 @@ suspend fun WebSocketSession.send(content: String) = send(Frame.Text(content))
  *
  * May suspend if the outgoing queue is full, and throw an exception if the channel is already closed.
  */
-suspend fun WebSocketSession.send(content: ByteArray) = send(Frame.Binary(true, ByteBuffer.wrap(content)))
+suspend fun WebSocketSession.send(content: ByteArray) = send(Frame.Binary(true, content))

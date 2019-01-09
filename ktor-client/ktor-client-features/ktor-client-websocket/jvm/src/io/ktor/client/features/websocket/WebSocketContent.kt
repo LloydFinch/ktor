@@ -27,7 +27,7 @@ class WebSocketContent: ClientUpgradeContent() {
 
     override fun verify(headers: Headers) {
         val serverAccept = headers[HttpHeaders.SecWebSocketAccept]
-                ?: error("Server should specify header ${HttpHeaders.SecWebSocketAccept}")
+            ?: error("Server should specify header ${HttpHeaders.SecWebSocketAccept}")
 
         val expectedAccept = websocketServerAccept(nonce)
         check(expectedAccept == serverAccept) {

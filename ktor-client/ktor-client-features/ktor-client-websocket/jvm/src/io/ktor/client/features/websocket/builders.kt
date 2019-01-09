@@ -21,7 +21,7 @@ suspend fun HttpClient.webSocketSession(
     method: HttpMethod = HttpMethod.Get, host: String = "localhost", port: Int = DEFAULT_PORT, path: String = "/",
     block: HttpRequestBuilder.() -> Unit = {}
 ): DefaultClientWebSocketSession {
-    val feature = feature(WebSockets) ?: error("WebSockets feature should be installed")
+    val feature = feature(WebSockets) ?: error("WebSockets feature should be installed.")
     val session = webSocketRawSession(method, host, port, path, block)
     val origin = DefaultWebSocketSessionImpl(session)
 
