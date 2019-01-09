@@ -1,8 +1,6 @@
 package io.ktor.client.engine.cio
 
 import io.ktor.application.*
-import io.ktor.client.*
-import io.ktor.client.engine.*
 import io.ktor.client.request.*
 import io.ktor.client.response.*
 import io.ktor.client.tests.utils.*
@@ -17,11 +15,12 @@ import io.ktor.server.jetty.*
 import io.ktor.util.*
 import kotlinx.coroutines.*
 import org.junit.*
+import org.junit.Test
 import java.io.*
 import java.security.*
+import java.security.cert.*
 import javax.net.ssl.*
 import kotlin.test.*
-import kotlin.test.Test
 
 class CIOHttpsTest : TestWithKtor() {
     override val server: ApplicationEngine = embeddedServer(Jetty, applicationEngineEnvironment {
@@ -158,6 +157,26 @@ class CIOHttpsTest : TestWithKtor() {
             }.await()
 
             assertEquals(testSize, received)
+        }
+    }
+
+    @Test
+    fun testCertificates() = clientTest(CIO) {
+        val keyStore = generateCertificate(File.createTempFile("test", "certificate"))
+        val clientCertificates = generateCertificate(File.createTempFile("test", "certificate"))
+            .aliases()
+            .asSequence()
+            .mapNotNull { keyStore.getCertificate(it) }
+            .filterIsInstance<X509Certificate>()
+
+        test { client ->
+            config {
+                engine {
+                    https {
+                        clientCertificates.forEach { addCertificate(it) }
+                    }
+                }
+            }
         }
     }
 }

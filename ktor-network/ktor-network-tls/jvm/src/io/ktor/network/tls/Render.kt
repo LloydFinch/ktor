@@ -4,6 +4,8 @@ import io.ktor.network.tls.extensions.*
 import kotlinx.coroutines.io.*
 import kotlinx.io.core.*
 import java.security.*
+import java.security.Certificate
+import java.security.cert.*
 import java.security.interfaces.*
 import java.security.spec.*
 import javax.crypto.*
@@ -64,6 +66,16 @@ internal fun BytePacketBuilder.writeTLSClientHello(
         writePacket(e)
     }
 }
+
+internal fun BytePacketBuilder.writeTLSCertificates(certificates: List<X509Certificate>) {
+    writeTripleByteLength(certificates.size)
+    for (certificate in certificates) {
+        val certificateBytes = certificate.encoded!!
+        writeTripleByteLength(certificateBytes.size)
+        writeFully(certificateBytes)
+    }
+}
+
 
 internal fun BytePacketBuilder.writeEncryptedPreMasterSecret(
     preSecret: ByteArray,

@@ -8,6 +8,7 @@ import kotlinx.coroutines.io.*
 import kotlinx.io.core.*
 import kotlinx.io.pool.*
 import java.nio.*
+import java.security.cert.*
 import javax.net.ssl.*
 import kotlin.coroutines.*
 
@@ -17,12 +18,14 @@ internal class TLSClientSession(
     trustManager: X509TrustManager?,
     randomAlgorithm: String,
     cipherSuites: List<CipherSuite>,
+    certificates: List<X509Certificate>,
     serverName: String?,
     override val coroutineContext: CoroutineContext
 ) : CoroutineScope, AReadable, AWritable {
+
     private val handshaker = TLSClientHandshake(
         rawInput, rawOutput, coroutineContext,
-        trustManager, randomAlgorithm, cipherSuites, serverName
+        trustManager, randomAlgorithm, cipherSuites, certificates, serverName
     )
 
     private val input = handshaker.input

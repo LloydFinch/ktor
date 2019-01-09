@@ -2,8 +2,8 @@ package io.ktor.client.engine.cio
 
 import io.ktor.client.engine.*
 import io.ktor.network.tls.*
-import io.ktor.util.*
 import java.security.*
+import java.security.cert.*
 import javax.net.ssl.*
 
 private val DEFAULT_RANDOM: String =
@@ -75,6 +75,11 @@ class HttpsConfig {
     var trustManager: X509TrustManager? = null
 
     /**
+     * List of client certificates to use.
+     */
+    val certificates: MutableList<X509Certificate> = mutableListOf()
+
+    /**
      * Random nonce generation algorithm.
      */
     var randomAlgorithm: String = DEFAULT_RANDOM
@@ -83,4 +88,11 @@ class HttpsConfig {
      * List of allowed [CipherSuite]s.
      */
     var cipherSuites: List<CipherSuite> = CIOCipherSuites.SupportedSuites
+
+    /**
+     * Add client certificate.
+     */
+    fun addCertificate(certificate: X509Certificate) {
+        certificates += certificate
+    }
 }

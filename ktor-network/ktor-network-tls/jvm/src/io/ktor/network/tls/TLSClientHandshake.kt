@@ -30,6 +30,7 @@ internal class TLSClientHandshake(
     private val trustManager: X509TrustManager? = null,
     randomAlgorithm: String = "NativePRNGNonBlocking",
     private val cipherSuites: List<CipherSuite>,
+    private val certificates: List<X509Certificate>,
     private val serverName: String? = null
 ) : CoroutineScope {
     private val digest = Digest()
@@ -216,6 +217,20 @@ internal class TLSClientHandshake(
                     } ?: throw TLSException("No suitable server certificate received: $certs")
                 }
                 TLSHandshakeType.CertificateRequest -> {
+                    val typeCount = packet.readByte()
+                    val types = packet.readBytes(typeCount.toInt())
+
+                    val hashAndSignCount = packet.readShort()
+                    val hashAndSign = mutableListOf<HashAndSign>()
+
+                    repeat(hashAndSignCount.toInt() / 2) {
+                        val hash = packet.readByte()
+                        val sign = packet.readByte()
+                        hashAndSign += HashAndSign(hash, sign)
+                    }
+
+                    val authorities = packet.readBytes()
+
                     certificateRequested = true
                     check(packet.remaining == 0L)
                 }
@@ -332,12 +347,17 @@ internal class TLSClientHandshake(
         sendHandshakeRecord(TLSHandshakeType.ClientKeyExchange) { writePacket(packet) }
     }
 
-    private fun sendClientCertificate() {
-        throw TLSException("Client certificates unsupported")
+    private suspend fun sendClientCertificate() {
+        sendHandshakeRecord(TLSHandshakeType.Certificate) {
+            writeTLSCertificates(certificates)
+        }
     }
 
-    private fun sendClientCertificateVerify() {
-        throw TLSException("Client certificates unsupported")
+    private suspend fun sendClientCertificateVerify() {
+        sendHandshakeRecord(TLSHandshakeType.CertificateVerify) {
+            val checksum = digest.doHash(serverHello.cipherSuite.hash.openSSLName)
+            writeFully(checksum)
+        }
     }
 
     private suspend fun sendChangeCipherSpec() {

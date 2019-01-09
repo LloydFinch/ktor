@@ -2,6 +2,7 @@ package io.ktor.network.tls
 
 import io.ktor.network.sockets.*
 import kotlinx.coroutines.io.*
+import java.security.cert.*
 import javax.net.ssl.*
 import kotlin.coroutines.*
 
@@ -13,6 +14,7 @@ suspend fun Socket.tls(
     trustManager: X509TrustManager? = null,
     randomAlgorithm: String = "NativePRNGNonBlocking",
     cipherSuites: List<CipherSuite> = CIOCipherSuites.SupportedSuites,
+    certificates: List<X509Certificate> = emptyList(),
     serverName: String? = null
 ): Socket {
     val reader = openReadChannel()
@@ -20,7 +22,7 @@ suspend fun Socket.tls(
 
     val session = try {
         TLSClientSession(
-            reader, writer, trustManager, randomAlgorithm, cipherSuites, serverName, coroutineContext
+            reader, writer, trustManager, randomAlgorithm, cipherSuites, certificates, serverName, coroutineContext
         ).also { it.start() }
     } catch (cause: Throwable) {
         reader.cancel(cause)
