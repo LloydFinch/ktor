@@ -4,7 +4,6 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.http.websocket.*
 import io.ktor.util.*
-import java.util.*
 
 private const val WEBSOCKET_VERSION = "13"
 private const val NONCE_SIZE = 16
@@ -12,9 +11,8 @@ private const val NONCE_SIZE = 16
 internal class WebSocketContent: ClientUpgradeContent() {
 
     private val nonce: String = buildString {
-        val bytes = ByteArray(NONCE_SIZE)
-        random.nextBytes(bytes)
-        append(encodeBase64(bytes))
+        val nonce = generateNonce(NONCE_SIZE)
+        append(nonce.encodeBase64())
     }
 
     override val headers: Headers = HeadersBuilder().apply {
@@ -33,9 +31,5 @@ internal class WebSocketContent: ClientUpgradeContent() {
         check(expectedAccept == serverAccept) {
             "Failed to verify server accept header. Expected: $expectedAccept, received: $serverAccept"
         }
-    }
-
-    companion object {
-        private val random = Random()
     }
 }

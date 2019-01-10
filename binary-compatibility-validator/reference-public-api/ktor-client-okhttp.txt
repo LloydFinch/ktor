@@ -22,3 +22,7 @@ public final class io/ktor/client/engine/okhttp/OkHttpEngineContainer : io/ktor/
 	public fun getFactory ()Lio/ktor/client/engine/HttpClientEngineFactory;
 }
 
+public final class io/ktor/client/engine/okhttp/UnsupportedFrameTypeException : java/lang/IllegalArgumentException {
+	public fun <init> (Lio/ktor/http/cio/websocket/Frame;)V
+}
+

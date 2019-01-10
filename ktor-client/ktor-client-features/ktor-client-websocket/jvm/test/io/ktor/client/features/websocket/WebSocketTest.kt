@@ -1,7 +1,6 @@
 package io.ktor.client.features.websocket
 
 import io.ktor.application.*
-import io.ktor.client.engine.cio.*
 import io.ktor.client.tests.utils.*
 import io.ktor.http.cio.websocket.*
 import io.ktor.http.cio.websocket.Frame

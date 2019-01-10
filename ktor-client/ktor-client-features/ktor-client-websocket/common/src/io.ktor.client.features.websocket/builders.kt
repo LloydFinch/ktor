@@ -21,7 +21,7 @@ suspend fun HttpClient.webSocketSession(
     method: HttpMethod = HttpMethod.Get, host: String = "localhost", port: Int = DEFAULT_PORT, path: String = "/",
     block: HttpRequestBuilder.() -> Unit = {}
 ): DefaultClientWebSocketSession = request {
-    this.method
+    this.method = method
     url("ws", host, port, path)
     block()
 }

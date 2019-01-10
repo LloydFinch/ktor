@@ -47,6 +47,7 @@ public final class io/ktor/util/Base64Kt {
 	public static final fun decodeBase64 (Lkotlinx/io/core/ByteReadPacket;)Ljava/lang/String;
 	public static final fun encodeBase64 (Ljava/lang/String;)Ljava/lang/String;
 	public static final fun encodeBase64 (Lkotlinx/io/core/ByteReadPacket;)Ljava/lang/String;
+	public static final fun encodeBase64 ([B)Ljava/lang/String;
 }
 
 public final class io/ktor/util/BufferViewJvmKt {
@@ -56,6 +57,10 @@ public final class io/ktor/util/BufferViewJvmKt {
 
 public final class io/ktor/util/ByteChannelsKt {
 	public static final fun split (Lkotlinx/coroutines/io/ByteReadChannel;Lkotlinx/coroutines/CoroutineScope;)Lkotlin/Pair;
+}
+
+public final class io/ktor/util/BytesKt {
+	public static final fun readShort ([BI)S
 }
 
 public final class io/ktor/util/CaseInsensitiveMap : java/util/Map, kotlin/jvm/internal/markers/KMutableMap {
@@ -130,6 +135,26 @@ public abstract interface class io/ktor/util/Digest {
 	public abstract fun build (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun plusAssign ([B)V
 	public abstract fun reset ()V
+}
+
+public final class io/ktor/util/DigestImpl : io/ktor/util/Digest {
+	public static final synthetic fun box-impl (Ljava/security/MessageDigest;)Lio/ktor/util/DigestImpl;
+	public fun build (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun build-impl (Ljava/security/MessageDigest;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun constructor-impl (Ljava/security/MessageDigest;)Ljava/security/MessageDigest;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/security/MessageDigest;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/security/MessageDigest;Ljava/security/MessageDigest;)Z
+	public final fun getDelegate ()Ljava/security/MessageDigest;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/security/MessageDigest;)I
+	public fun plusAssign ([B)V
+	public static fun plusAssign-impl (Ljava/security/MessageDigest;[B)V
+	public fun reset ()V
+	public static fun reset-impl (Ljava/security/MessageDigest;)V
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/security/MessageDigest;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/security/MessageDigest;
 }
 
 public final class io/ktor/util/GenerateOnlyNonceManager : io/ktor/util/NonceManager {

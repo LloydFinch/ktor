@@ -51,6 +51,12 @@ fun generateNonce(size: Int): ByteArray = buildPacket {
     }
 }.readBytes(size)
 
+/**
+ * Compute SHA-1 hash for the specified [bytes]
+ */
+@KtorExperimentalAPI
+expect fun sha1(bytes: ByteArray): ByteArray
+
 @InternalAPI
 expect fun Digest(name: String): Digest
 

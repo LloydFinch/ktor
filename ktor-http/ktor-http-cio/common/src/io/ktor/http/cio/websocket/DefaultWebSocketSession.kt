@@ -23,3 +23,12 @@ interface DefaultWebSocketSession : WebSocketSession {
      */
     val closeReason: Deferred<CloseReason?>
 }
+
+/**
+ * Create [DefaultWebSocketSession] from session.
+ */
+expect fun DefaultWebSocketSession(
+    session: WebSocketSession,
+    pingInterval: Long = -1L,
+    timeoutMillis: Long = 15000L
+): DefaultWebSocketSession

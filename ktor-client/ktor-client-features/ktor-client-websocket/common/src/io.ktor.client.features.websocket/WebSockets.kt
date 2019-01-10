@@ -1,16 +1,12 @@
 package io.ktor.client.features.websocket
 
 import io.ktor.client.*
-import io.ktor.client.call.*
 import io.ktor.client.features.*
 import io.ktor.client.request.*
 import io.ktor.client.response.*
 import io.ktor.http.*
 import io.ktor.http.cio.websocket.*
 import io.ktor.util.*
-import kotlinx.coroutines.*
-import kotlinx.io.core.*
-import kotlin.reflect.full.*
 
 /**
  * Client WebSocket feature.
@@ -39,8 +35,9 @@ class WebSockets(
 
             scope.responsePipeline.intercept(HttpResponsePipeline.Transform) { (info, response) ->
                 val content = context.request.content
+                val expected = info.type
 
-                if (!info.type.isSubclassOf(WebSocketSession::class)
+                if ((expected != ClientWebSocketSession::class && expected != DefaultClientWebSocketSession::class)
                     || response !is HttpResponse
                     || response.status.value != HttpStatusCode.SwitchingProtocols.value
                     || content !is WebSocketContent
@@ -48,12 +45,10 @@ class WebSockets(
 
                 val session = context.attributes.getOrNull(sessionKey) ?: return@intercept
 
-                if (info.type.isSubclassOf(DefaultWebSocketSession::class)) {
-                    val defaultSession = if (session is DefaultWebSocketSession) {
-                        session
-                    } else {
-                        DefaultWebSocketSessionImpl(session, feature.maxFrameSize)
-                    }
+                if (info.type == DefaultClientWebSocketSession::class) {
+                    val defaultSession = if (session !is DefaultWebSocketSession)
+                        DefaultWebSocketSession(session, feature.maxFrameSize)
+                    else session
 
                     proceedWith(HttpResponseContainer(info, DefaultClientWebSocketSession(context, defaultSession)))
                     return@intercept

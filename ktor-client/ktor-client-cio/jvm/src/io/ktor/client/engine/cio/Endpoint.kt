@@ -152,7 +152,7 @@ internal class Endpoint(
         }
     }
 
-    private suspend fun handleWebsocketUpgrade(
+    private fun handleWebsocketUpgrade(
         request: HttpRequest,
         input: ByteReadChannel, output: ByteWriteChannel, callContext: CoroutineContext
     ) {

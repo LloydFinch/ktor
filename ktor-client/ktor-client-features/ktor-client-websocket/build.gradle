@@ -1,7 +1,7 @@
 description = "Ktor websocket support"
 
 kotlin.sourceSets {
-    jvmMain.dependencies {
+    commonMain.dependencies {
         api project(':ktor-client:ktor-client-core')
         api project(':ktor-http:ktor-http-cio')
     }

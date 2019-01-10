@@ -1,5 +1,6 @@
 @file:kotlin.jvm.JvmMultifileClass
 @file:kotlin.jvm.JvmName("CryptoKt")
+
 package io.ktor.util
 
 import kotlinx.coroutines.*
@@ -22,12 +23,14 @@ private fun getDigest(text: String, algorithm: String, salt: String): ByteArray 
  * Compute SHA-1 hash for the specified [bytes]
  */
 @KtorExperimentalAPI
-fun sha1(bytes: ByteArray): ByteArray = MessageDigest.getInstance("SHA1").digest(bytes)!!
+actual fun sha1(bytes: ByteArray): ByteArray = runBlocking {
+    Digest("SHA1").also { it += bytes }.build()
+}
+
+actual fun Digest(name: String): Digest = DigestImpl(MessageDigest.getInstance(name))
 
 @InternalAPI
-actual fun Digest(name: String): Digest = object : Digest {
-    private val delegate = MessageDigest.getInstance(name)
-
+inline class DigestImpl(val delegate: MessageDigest) : Digest {
     override fun plusAssign(bytes: ByteArray) {
         delegate.update(bytes)
     }

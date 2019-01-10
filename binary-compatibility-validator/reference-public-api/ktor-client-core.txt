@@ -56,6 +56,7 @@ public final class io/ktor/client/call/DoubleReceiveException : java/lang/Illega
 
 public final class io/ktor/client/call/HttpClientCall : java/io/Closeable, kotlinx/coroutines/CoroutineScope {
 	public fun close ()V
+	public final fun getAttributes ()Lio/ktor/util/Attributes;
 	public final fun getClient ()Lio/ktor/client/HttpClient;
 	public fun getCoroutineContext ()Lkotlin/coroutines/CoroutineContext;
 	public final fun getRequest ()Lio/ktor/client/request/HttpRequest;
@@ -113,6 +114,10 @@ public final class io/ktor/client/call/TypeInfo {
 
 public final class io/ktor/client/call/UnsupportedContentTypeException : java/lang/IllegalStateException {
 	public fun <init> (Lio/ktor/http/content/OutgoingContent;)V
+}
+
+public final class io/ktor/client/call/UnsupportedUpgradeProtocolException : java/lang/IllegalArgumentException {
+	public fun <init> (Lio/ktor/http/Url;)V
 }
 
 public final class io/ktor/client/call/UtilsJvmKt {
@@ -624,6 +629,20 @@ public final class io/ktor/client/response/ReadersKt {
 	public static final fun discardRemaining (Lio/ktor/client/response/HttpResponse;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun readBytes (Lio/ktor/client/response/HttpResponse;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun readBytes (Lio/ktor/client/response/HttpResponse;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/ktor/client/response/UpgradeHttpResponse : io/ktor/client/response/HttpResponse {
+	public fun <init> (Lio/ktor/client/call/HttpClientCall;Lio/ktor/util/date/GMTDate;Lkotlin/coroutines/CoroutineContext;)V
+	public fun close ()V
+	public fun getCall ()Lio/ktor/client/call/HttpClientCall;
+	public fun getContent ()Lkotlinx/coroutines/io/ByteReadChannel;
+	public fun getCoroutineContext ()Lkotlin/coroutines/CoroutineContext;
+	public fun getExecutionContext ()Lkotlinx/coroutines/Job;
+	public fun getHeaders ()Lio/ktor/http/Headers;
+	public fun getRequestTime ()Lio/ktor/util/date/GMTDate;
+	public fun getResponseTime ()Lio/ktor/util/date/GMTDate;
+	public fun getStatus ()Lio/ktor/http/HttpStatusCode;
+	public fun getVersion ()Lio/ktor/http/HttpProtocolVersion;
 }
 
 public final class io/ktor/client/utils/ByteBufferPool : kotlinx/io/pool/DefaultPool {
