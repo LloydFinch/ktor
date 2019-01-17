@@ -17,7 +17,6 @@ task stubDokka(type: Jar) {
 
 def selectArtifactId(project, type, defaultName) {
     def name = project.name
-    def OBSOLETE = "$name-$type-obsolete"
     def isCommon = project.ext.has("commonStructure")
     def commonIsRoot = project.ext.has("commonStructure") && project.ext.commonStructure
     def hasNative = project.ext.has("hasNative") && project.ext.hasNative
@@ -28,7 +27,7 @@ def selectArtifactId(project, type, defaultName) {
             return commonIsRoot ? "$name" : "$name-common"
             break
         case 'kotlinMultiplatform':
-            if (!hasNative) return OBSOLETE
+            if (!hasNative) return defaultName
             return isCommon ? "$name-native" : "$name"
             break
         case 'jvm':
@@ -115,8 +114,6 @@ publishing {
             }
         }
     }
-
-    publications.removeIf { it.artifactId.endsWith("-obsolete") }
 }
 
 bintray {
